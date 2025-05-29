@@ -30,4 +30,12 @@ public class ApiResponseDto<T> {
                 "요청 성공",
                 data);
     }
+
+    public static ApiResponseDto<String> defaultOk() {
+        return ApiResponseDto.createOk(null);
+    }
+
+    public static ApiResponseDto<String> createError(String code, String message) {
+        return new ApiResponseDto<>(code, message);
+    }
 }
