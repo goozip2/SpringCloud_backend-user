@@ -28,7 +28,7 @@ public class ApiCommonAdvice {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFound.class)
-    public ApiResponseDto<String> handleBadParameter(NotFound e) {
+    public ApiResponseDto<String> handleNotFound(NotFound e) {
         return ApiResponseDto.createError(
                 e.getErrorCode(),
                 e.getErrorMessage()
