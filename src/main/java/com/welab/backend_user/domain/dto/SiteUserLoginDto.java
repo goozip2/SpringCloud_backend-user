@@ -1,7 +1,10 @@
 package com.welab.backend_user.domain.dto;
 
+import com.welab.backend_user.domain.SiteUser;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
 
+@Getter
 public class SiteUserLoginDto {
     @NotBlank(message = "아이디를 입력하세요.")
     private String userId;

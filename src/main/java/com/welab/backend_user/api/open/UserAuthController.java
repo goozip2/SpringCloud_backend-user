@@ -28,7 +28,12 @@ public class UserAuthController {
 
     @PostMapping(value = "/login")
     public ApiResponseDto<String> login(@RequestBody SiteUserLoginDto siteUserLoginDto) {
-        return ApiResponseDto.defaultOk();
+        boolean loginSuccess = siteUserService.loginUser(siteUserLoginDto);
+        if(loginSuccess) {
+            return ApiResponseDto.defaultOk();
+        } else {
+            return ApiResponseDto.createError("FAIL", "로그인 실패");
+        }
     }
 
 }
