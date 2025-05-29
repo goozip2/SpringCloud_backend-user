@@ -23,10 +23,11 @@ eureka:
 #    lease-renewal-interval-in-seconds: 10 # 하트비트 간격(기본 30초)
 #    lease-expiration-duration-in-seconds: 30 # 만료 시간(기본 90초)
   client:
-    # 유레카 서버에 서비스 등록
+    # 유레카에 자신 등록 (다른 서비스들이 검색할 수 있게) (export)
     register-with-eureka: true
-    # 서비스 목록 가져와야함?
+    # 유레카에서 다른 서비스 목록 가져올지 여부 (import)
     fetch-registry: true
+    # 유레카 서버의 위치 주소
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
 
