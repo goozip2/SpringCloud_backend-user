@@ -1,6 +1,5 @@
 package com.welab.backend_user.domain.dto;
 
-import com.welab.backend_user.domain.SiteUser;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 

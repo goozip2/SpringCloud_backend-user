@@ -1,7 +1,6 @@
 package com.welab.backend_user.domain.repository;
 
 import com.welab.backend_user.domain.SiteUser;
-import com.welab.backend_user.domain.dto.SiteUserRegisterDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

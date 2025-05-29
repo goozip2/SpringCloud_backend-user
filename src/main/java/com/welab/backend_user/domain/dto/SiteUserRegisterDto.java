@@ -1,8 +1,6 @@
 package com.welab.backend_user.domain.dto;
 
-import com.welab.backend_user.common.exception.BadParameter;
 import com.welab.backend_user.domain.SiteUser;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
