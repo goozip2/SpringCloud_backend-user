@@ -50,3 +50,14 @@ spring:
     # properties:
     #   hibernate:
     #     dialect: org.hibernate.dialect.MySQL8Dialect
+
+
+jwt:
+  # 일반 토큰 만료 시간
+  expires-in: 86400 # 1day
+  # 모바일용 토큰 만료 시간
+  mobile-expires-in: 31536000
+  # PC용 토큰 만료 시간
+  table-expires-in: 31536000
+  # 토큰 서명에 사용하는 비밀키
+  secret-key: AADfaskllew32dsfasdTG764Gdslkj298GsWg86Ggkgkgkgkgkgkgkgk

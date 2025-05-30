@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface SiteUserRepository extends JpaRepository<SiteUser, Long> {
     //SiteUser 반환 대신, Optional 사용으로 null 처리 안정화
-    Optional<SiteUser> findByUserId(String userId);
+    //Optional<SiteUser> findByUserId(String userId);
+    SiteUser findByUserId(String userId);
 }

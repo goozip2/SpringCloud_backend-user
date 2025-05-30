@@ -2,7 +2,9 @@ package com.welab.backend_user.api.open;
 
 import com.welab.backend_user.common.dto.ApiResponseDto;
 import com.welab.backend_user.domain.dto.SiteUserLoginDto;
+import com.welab.backend_user.domain.dto.SiteUserRefreshDto;
 import com.welab.backend_user.domain.dto.SiteUserRegisterDto;
+import com.welab.backend_user.secret.jwt.dto.TokenDto;
 import com.welab.backend_user.service.SiteUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +29,15 @@ public class UserAuthController {
     }
 
     @PostMapping(value = "/login")
-    public ApiResponseDto<String> login(@RequestBody SiteUserLoginDto siteUserLoginDto) {
-        boolean loginSuccess = siteUserService.loginUser(siteUserLoginDto);
-        if(loginSuccess) {
-            return ApiResponseDto.defaultOk();
-        } else {
-            return ApiResponseDto.createError("FAIL", "로그인 실패");
-        }
+    public ApiResponseDto<TokenDto.AccessRefreshToken> login(@RequestBody @Valid SiteUserLoginDto siteUserLoginDto) {
+        TokenDto.AccessRefreshToken token = siteUserService.login(siteUserLoginDto);
+        return ApiResponseDto.createOk(token);
+    }
+
+    @PostMapping(value = "/refresh")
+    public ApiResponseDto<TokenDto.AccessToken> refresh(@RequestBody @Valid SiteUserRefreshDto refreshDto) {
+        TokenDto.AccessToken token = siteUserService.refresh(refreshDto);
+        return ApiResponseDto.createOk(token);
     }
 
 }

@@ -1,10 +1,18 @@
 package com.welab.backend_user.service;
 
+import com.welab.backend_user.common.exception.BadParameter;
+import com.welab.backend_user.common.exception.NotFound;
 import com.welab.backend_user.domain.SiteUser;
 import com.welab.backend_user.domain.dto.SiteUserLoginDto;
+import com.welab.backend_user.domain.dto.SiteUserRefreshDto;
 import com.welab.backend_user.domain.dto.SiteUserRegisterDto;
 import com.welab.backend_user.domain.repository.SiteUserRepository;
-import jakarta.transaction.Transactional;
+import com.welab.backend_user.remote.alim.RemoteAlimService;
+import com.welab.backend_user.remote.alim.dto.AlimSendSmsDto;
+import com.welab.backend_user.secret.hash.SecureHashUtils;
+import com.welab.backend_user.secret.jwt.dto.TokenDto;
+import com.welab.backend_user.secret.jwt.props.TokenGenerator;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,23 +22,57 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SiteUserService {
     private final SiteUserRepository siteUserRepository;
+    private final TokenGenerator tokenGenerator;
+    private  final RemoteAlimService remoteAlimService;
 
     @Transactional
     public void registerUser(SiteUserRegisterDto registerDto) {
         SiteUser siteUser = registerDto.toEntity();
         siteUserRepository.save(siteUser);
+        // 회원가입 시, 알림톡 전송
+        AlimSendSmsDto.Request request = AlimSendSmsDto.Request.fromEntity(siteUser);
+        remoteAlimService.sendSms(request);
     }
 
-    public boolean loginUser(SiteUserLoginDto siteUserLoginDto) {
+//    @Transactional
+//    public boolean loginUser(SiteUserLoginDto siteUserLoginDto) {
+//
+//        // toEntity 사용 X: SiteUser Entity nullable false 필드 채워줘야 하는 번거로움
+//        String userId = siteUserLoginDto.getUserId();
+//        String password = siteUserLoginDto.getPassword();
+//
+//        return siteUserRepository.findByUserId(userId)
+//                //  map: Optional에 값이 있을 경우, 값 변환 (SiteUser → boolean)
+//                .map(user -> user.getPassword().equals(password))
+//                // orElse: Optional에 값이 없을 경우, 기본값(false) 반환
+//                .orElse(false);
+//    }
 
-        // toEntity 사용 X: SiteUser Entity nullable false 필드 채워줘야 하는 번거로움
-        String userId = siteUserLoginDto.getUserId();
-        String password = siteUserLoginDto.getPassword();
+    @Transactional(readOnly = true)
+    public TokenDto.AccessRefreshToken login(SiteUserLoginDto loginDto) {
+        SiteUser user = siteUserRepository.findByUserId(loginDto.getUserId());
 
-        return siteUserRepository.findByUserId(userId)
-                //  map: Optional에 값이 있을 경우, 값 변환 (SiteUser → boolean)
-                .map(user -> user.getPassword().equals(password))
-                // orElse: Optional에 값이 없을 경우, 기본값(false) 반환
-                .orElse(false);
+        if (user == null) {
+            throw new NotFound("아이디 또는 비밀번호를 확인하세요.");
+        }
+        if( !SecureHashUtils.matches(loginDto.getPassword(), user.getPassword())){
+            throw new BadParameter("아이디 또는 비밀번호를 확인하세요.");
+        }
+        return tokenGenerator.generateAccessRefreshToken(loginDto.getUserId(), "WEB");
+    }
+
+    @Transactional(readOnly = true)
+    public TokenDto.AccessToken refresh(SiteUserRefreshDto refreshDto) {
+        String userId = tokenGenerator.validateJwtToken(refreshDto.getToken());
+        if (userId == null) {
+            // 불법 토큰 || 재로그인 필요 || 비정상 토큰 등
+            throw new BadParameter("토큰이 유효하지 않습니다.");
+        }
+        SiteUser user = siteUserRepository.findByUserId(userId);
+        if (user == null) {
+            // 탈퇴한 사용자 || DB 정합성 오류 등
+            throw new NotFound("사용자를 찾을 수 없습니다.");
+        }
+        return tokenGenerator.generateAccessToken(userId, "WEB");
     }
 }
