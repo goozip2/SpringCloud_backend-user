@@ -1,6 +1,9 @@
 package com.welab.backend_user.api.backend;
 
+import com.welab.backend_user.common.dto.ApiResponseDto;
+import com.welab.backend_user.domain.dto.SiteUserInfoDto;
 import com.welab.backend_user.domain.dto.UserInfoDto;
+import com.welab.backend_user.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -11,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/backend/user/v1", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class BackEndUserController {
+
+    private final SiteUserService siteUserService;
 
     @GetMapping(value="/hello")
     public String hello() {
@@ -34,4 +39,11 @@ public class BackEndUserController {
         response.setPhoneNumber("010-0000-0000");
         return response;
     }
+
+    @GetMapping(value = "/user/{userId}")
+    public ApiResponseDto<SiteUserInfoDto> siteUserInfo(@PathVariable String userId) {
+        SiteUserInfoDto userInfoDto = siteUserService.userInfo(userId);
+        return ApiResponseDto.createOk(userInfoDto);
+    }
+
 }
