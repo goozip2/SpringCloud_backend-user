@@ -1,3 +1,33 @@
 spring:
   application:
     name: backend-user
+
+  kafka:
+    listener:
+      # Kafka 메시지를 수동으로 확인(ack) 처리하되, 즉시 offset을 커밋(commit)
+      # 개발자가 명시적으로 ack.acknowledge() 호출 시, offset 커밋 (메시지 안전히 처리 후 커밋하고 싶을 경우)
+      ack-mode: manual_immediate
+    consumer:
+      # 컨슈머 그룹 ID를 Spring Application 이름으로 설정
+      group-id: ${spring.application.name}
+      # kafka 메시지의 키를 문자열로 역직렬화
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # kafka 메시지의 값을 JSON 형태로 역직렬화
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      # kafka가 자동으로 offset을 커밋하지 않도록 설정 (수동 커밋 제어 acknowledge 위함)
+      enable-auto-commit: false
+      # 지정된 offset이 없을 때, 가장 마지막 메시지부터 소비 (이전 메시지 무시하고 최신 메시지부터 읽기)
+      auto-offset-reset: latest
+      # 한 번에 최대 10개의 메시지를 poll하도록 제한 (처리 부담 줄이기)
+      max-poll-records: 10
+      properties:
+        # JSON 역직렬화 시, 모든 패키지를 신뢰 대상으로 허용
+        spring.json.trusted.packages: "*"
+        # kafka 메시지 헤더에 포함된 클래스 타입 정보 무시
+        spring.json.use.type.headers: false # 헤더의 타입 정보 무시
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        # kafka 메시지에 Java 타입 정보를 헤더로 추가하지 않음
+        spring.json.add.type.headers: false # 타입 헤더 추가 비활성화
