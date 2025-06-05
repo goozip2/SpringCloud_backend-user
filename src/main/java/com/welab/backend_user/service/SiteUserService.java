@@ -2,6 +2,7 @@ package com.welab.backend_user.service;
 
 import com.welab.backend_user.common.exception.BadParameter;
 import com.welab.backend_user.common.exception.NotFound;
+import com.welab.backend_user.common.type.ActionAndId;
 import com.welab.backend_user.domain.SiteUser;
 import com.welab.backend_user.domain.dto.SiteUserInfoDto;
 import com.welab.backend_user.domain.dto.SiteUserLoginDto;
@@ -33,11 +34,14 @@ public class SiteUserService {
     public void registerUser(SiteUserRegisterDto registerDto) {
         SiteUser siteUser = registerDto.toEntity();
         siteUserRepository.save(siteUser);
-        // 회원가입 시, 알림톡 전송
-        //AlimSendSmsDto.Request request = AlimSendSmsDto.Request.fromEntity(siteUser);
-        //remoteAlimService.sendSms(request);
         SiteUserInfoEvent message = SiteUserInfoEvent.fromEntity("Create", siteUser);
         kafkaMessageProducer.send(SiteUserInfoEvent.Topic, message); //Topic: userinfo, message: dto
+    }
+
+    @Transactional
+    public ActionAndId registerUserAndNotify(SiteUserRegisterDto registerDto) {SiteUser siteUser = registerDto.toEntity();
+        siteUserRepository.save(siteUser);
+        return ActionAndId.of("Create", siteUser.getId());
     }
 
     @Transactional(readOnly = true)
