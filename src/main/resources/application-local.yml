@@ -1,21 +1,13 @@
 server:
   port: 8081
 
-eureka:
-  instance:
-    prefer-ip-address: true
-  #    lease-renewal-interval-in-seconds: 10 # 하트비트 간격(기본 30초)
-  #    lease-expiration-duration-in-seconds: 30 # 만료 시간(기본 90초)
-  client:
-    # 유레카에 자신 등록 (다른 서비스들이 검색할 수 있게) (export)
-    register-with-eureka: true
-    # 유레카에서 다른 서비스 목록 가져올지 여부 (import)
-    fetch-registry: true
-    # 유레카 서버의 위치 주소
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
-
 spring:
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  cloud:
+    config:
+      enabled: false
   datasource:
     url: jdbc:mysql://localhost:13306/user?serverTimezone=UTC&useSSL=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8
     username: user
@@ -34,6 +26,19 @@ spring:
     #   hibernate:
     #     dialect: org.hibernate.dialect.MySQL8Dialect
 
+eureka:
+  instance:
+    prefer-ip-address: true
+  #    lease-renewal-interval-in-seconds: 10 # 하트비트 간격(기본 30초)
+  #    lease-expiration-duration-in-seconds: 30 # 만료 시간(기본 90초)
+  client:
+    # 유레카에 자신 등록 (다른 서비스들이 검색할 수 있게) (export)
+    register-with-eureka: true
+    # 유레카에서 다른 서비스 목록 가져올지 여부 (import)
+    fetch-registry: true
+    # 유레카 서버의 위치 주소
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
 
 jwt:
   # 일반 토큰 만료 시간
@@ -47,20 +52,4 @@ jwt:
 
 kafka:
   bootstrap-servers: localhost:9092
-
-#spring:
-#  cloud:
-#    discovery:
-#      client:
-#        simple:
-#          instances:
-#            # 'my-backend-service'에 대한 인스턴스 정의
-#            # service Discovery가 없으면, 서비스 인스턴스 위치(호스트의 포트)를 알아야 클라이언트가 직접 호출 가능
-#            # 호스트:포트 목록을 직접 명시해서 여러 인스턴스를 등록해두고,
-#            # 클라이언트에서 이를 기반으로 라운드로빈 등 간단한 로드밸런싱을 수행
-#            alim-service:
-#              - service-id: alim-service
-#                uri: http://localhost:8082
-#              - service-id: alim-service
-#                uri: http://localhost:8082
 
